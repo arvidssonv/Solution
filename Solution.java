@@ -1,50 +1,36 @@
 import java.util.*;
 
 public class Solution implements SolutionInterface {
-    int[] result;
+    int[] buyAndSellDay;
     public Solution() {
         // You can initiate and calculate things here
         int numOfDays = API.getNumDays();
-        int[] price = new int[numOfDays];
-        for (int i = 0; i < price.length; i++) {
-            price[i] = API.getPriceOnDay(i);
-        }
-        //System.out.println(Arrays.toString(price));
-        int[] diff = new int[numOfDays];
-        diff[0] = 0;
-        for (int i = 1; i < diff.length; i++) {
-            diff[i] = price[i] - price[i-1];    
-        }
-        //System.out.println(Arrays.toString(diff));
-        this.result = max(diff);
-    }
-
-    public static int[] max(int[] diff) {
-        // find the sequence of numbers in the diff array that gives the highest value, even if its a negative number
-        // return is an array of the days to buy and sell, result[0] = buy, result[1] = sell
-        int[] result = new int[2];
         int maxBuy = 0;
         int maxSell = 1;
-        int buy = 0;
-        int maxProfit = diff[maxSell];
+        int buyDay = 0;
+        int maxProfit = Integer.MIN_VALUE;
         int currentProfit = 0;
-        for (int i = 1; i < diff.length; i++) {
-            currentProfit += diff[i];
-            //System.out.println(currentProfit);
+        int previousDaysPrice = API.getPriceOnDay(0);
+
+        for (int i = 1; i < numOfDays; i++) {            
+            int todaysPrice = API.getPriceOnDay(i);
+            currentProfit += (todaysPrice - previousDaysPrice);
+            previousDaysPrice = todaysPrice;
             if (currentProfit > maxProfit) {
                 maxProfit = currentProfit;
                 maxSell = i;
-                maxBuy = buy;
+                maxBuy = buyDay;
             }
             if (currentProfit < 0) {
                 currentProfit = 0;
-                buy = i;
+                buyDay = i;
             }
         }
-        //System.out.println(maxProfit);
+        
+        int[] result = new int[2];
         result[0] = maxBuy;
         result[1] = maxSell;
-        return result;
+        this.buyAndSellDay = result;
     }
 
     /**
@@ -53,7 +39,7 @@ public class Solution implements SolutionInterface {
      */
     public int getBuyDay() {
         // Write your code here
-        return result[0];
+        return buyAndSellDay[0];
     }
 
     /**
@@ -63,6 +49,6 @@ public class Solution implements SolutionInterface {
      */
     public int getSellDay() {
         // Write your code here
-        return result[1];
+        return buyAndSellDay[1];
     }
 }
